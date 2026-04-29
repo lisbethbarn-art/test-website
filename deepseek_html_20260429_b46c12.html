@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Личный блог — демо (локальное хранилище)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+            line-height: 1.5;
+            padding: 0 1rem 3rem;
+        }
+
+        /* header */
+        .header {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 0 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        button, .btn-like {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            color: #1e293b;
+        }
+
+        button.primary {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        button.primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        button.danger {
+            background: #fff;
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+
+        button.danger:hover {
+            background: #fee2e2;
+            border-color: #f87171;
+        }
+
+        button.outline {
+            background: transparent;
+            border: 1px solid #cbd5e1;
+        }
+
+        button:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* cards */
+        .articles-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .article-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            border: 1px solid #eef2f6;
+            cursor: pointer;
+        }
+
+        .article-card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            transform: translateY(-2px);
+            border-color: #cbd5e1;
+        }
+
+        .article-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+        }
+
+        .article-meta {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 0.75rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .article-excerpt {
+            color: #334155;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* form styles */
+        .form-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 1rem;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .message {
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+            color: #ef4444;
+        }
+
+        .success {
+            color: #10b981;
+        }
+
+        hr {
+            margin: 1.5rem 0;
+            border: none;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .comment {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid #cbd5e1;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .comment-date {
+            color: #94a3b8;
+            font-size: 0.7rem;
+        }
+
+        .comment-text {
+            color: #0f172a;
+            margin: 0.5rem 0 0;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #3b82f6;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 2rem;
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .article-title {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo">
+        <h1>✨ Личный блог</h1>
+    </div>
+    <div class="nav" id="nav-buttons">
+        <!-- динамическая навигация -->
+    </div>
+</div>
+
+<main class="container" id="app-root">
+    <!-- сюда будет рендериться интерфейс (списки, формы, статьи) -->
+</main>
+
+<footer>
+    Демо-версия · Данные хранятся в <strong>localStorage</strong> · Регистрация / статьи / комментарии
+</footer>
+
+<script>
+    // ----- УТИЛИТЫ для работы с localStorage и данными -----
+    const STORAGE_KEYS = {
+        USERS: 'blog_users',
+        ARTICLES: 'blog_articles',
+        COMMENTS: 'blog_comments',
+        CURRENT_USER: 'blog_current_user'
+    };
+
+    // инициализация хранилища, если пусто
+    function initStorage() {
+        if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
+            // демо-пользователь (автор)
+            const demoUsers = [
+                { id: 1001, username: 'alex_author', password: '123456' },
+                { id: 1002, username: 'reader_demo', password: 'pass' }
+            ];
+            localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(demoUsers));
+        }
+        if (!localStorage.getItem(STORAGE_KEYS.ARTICLES)) {
+            const demoArticles = [
+                {
+                    id: 2001,
+                    title: 'Добро пожаловать в локальный блог!',
+                    content: 'Это демонстрационная статья. Вы можете зарегистрироваться, писать собственные статьи и оставлять комментарии. Все данные хранятся в вашем браузере (localStorage).',
+                    authorId: 1001,
+                    authorName: 'alex_author',
+                    createdAt: new Date(Date.now() - 86400000).toISOString() // вчера
+                },
+                {
+                    id: 2002,
+                    title: 'Как работает фронтенд-демо без сервера',
+                    content: 'Используется localStorage как база данных + чистый JavaScript. Регистрация имитирует проверку логина/пароля. Комментарии умеют удаляться автором или автором статьи.',
+                    authorId: 1001,
+                    authorName: 'alex_author',
+                    createdAt: new Date(Date.now() - 43200000).toISOString()
+                }
+            ];
+            localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(demoArticles));
+        }
+        if (!localStorage.getItem(STORAGE_KEYS.COMMENTS)) {
+            const demoComments = [
+                {
+                    id: 3001,
+                    articleId: 2001,
+                    userId: 1002,
+                    userName: 'reader_demo',
+                    text: 'Отличная идея! Очень удобно для тестов.',
+                    createdAt: new Date(Date.now() - 7200000).toISOString()
+                }
+            ];
+            localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(demoComments));
+        }
+    }
+
+    // вспомогательная функция получения данных
+    function getUsers() { return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)) || []; }
+    function getArticles() { return JSON.parse(localStorage.getItem(STORAGE_KEYS.ARTICLES)) || []; }
+    function getComments() { return JSON.parse(localStorage.getItem(STORAGE_KEYS.COMMENTS)) || []; }
+    function saveUsers(users) { localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users)); }
+    function saveArticles(articles) { localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(articles)); }
+    function saveComments(comments) { localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(comments)); }
+
+    // текущий пользователь (сессия)
+    let currentUser = null;
+
+    function loadCurrentUser() {
+        const stored = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+        if (stored) {
+            try {
+                currentUser = JSON.parse(stored);
+            } catch(e) { currentUser = null; }
+        } else {
+            currentUser = null;
+        }
+    }
+
+    function saveCurrentUser(user) {
+        if (user) {
+            localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+        } else {
+            localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+        }
+        currentUser = user;
+    }
+
+    // простая генерация ID (без crypto)
+    function generateId(prefix = 1) {
+        return Date.now() + Math.floor(Math.random() * 10000) + prefix;
+    }
+
+    // ---- БИЗНЕС-ЛОГИКА ----
+    function registerUser(username, password) {
+        const users = getUsers();
+        if (users.find(u => u.username === username)) {
+            return { success: false, error: 'Пользователь с таким именем уже существует' };
+        }
+        if (!username.trim() || !password.trim()) {
+            return { success: false, error: 'Имя и пароль не могут быть пустыми' };
+        }
+        const newId = generateId(1000);
+        const newUser = { id: newId, username: username.trim(), password: password.trim() };
+        users.push(newUser);
+        saveUsers(users);
+        return { success: true, user: newUser };
+    }
+
+    function loginUser(username, password) {
+        const users = getUsers();
+        const found = users.find(u => u.username === username && u.password === password);
+        if (found) {
+            // не храним пароль в сессии, только id и username
+            const sessionUser = { id: found.id, username: found.username };
+            saveCurrentUser(sessionUser);
+            return { success: true, user: sessionUser };
+        }
+        return { success: false, error: 'Неверное имя пользователя или пароль' };
+    }
+
+    function logout() {
+        saveCurrentUser(null);
+        renderApp(); // обновляем интерфейс
+    }
+
+    function createArticle(title, content, authorId, authorName) {
+        if (!title.trim() || !content.trim()) {
+            return { success: false, error: 'Заголовок и содержание не могут быть пустыми' };
+        }
+        const articles = getArticles();
+        const newArticle = {
+            id: generateId(2000),
+            title: title.trim(),
+            content: content.trim(),
+            authorId: authorId,
+            authorName: authorName,
+            createdAt: new Date().toISOString()
+        };
+        articles.unshift(newArticle); // новые сверху
+        saveArticles(articles);
+        return { success: true, article: newArticle };
+    }
+
+    function addComment(articleId, userId, userName, text) {
+        if (!text.trim()) return { success: false, error: 'Текст комментария не может быть пустым' };
+        const comments = getComments();
+        const newComment = {
+            id: generateId(3000),
+            articleId: articleId,
+            userId: userId,
+            userName: userName,
+            text: text.trim(),
+            createdAt: new Date().toISOString()
+        };
+        comments.push(newComment);
+        saveComments(comments);
+        return { success: true, comment: newComment };
+    }
+
+    function deleteComment(commentId, currentUserId, articleAuthorId) {
+        const comments = getComments();
+        const comment = comments.find(c => c.id === commentId);
+        if (!comment) return false;
+        // право: автор комментария ИЛИ автор статьи
+        if (comment.userId === currentUserId || articleAuthorId === currentUserId) {
+            const updated = comments.filter(c => c.id !== commentId);
+            saveComments(updated);
+            return true;
+        }
+        return false;
+    }
+
+    function getArticleById(articleId) {
+        const articles = getArticles();
+        return articles.find(a => a.id === articleId);
+    }
+
+    function getCommentsForArticle(articleId) {
+        const comments = getComments();
+        return comments.filter(c => c.articleId === articleId).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    // ---- ОТРИСОВКА UI (чистый DOM) ----
+    let currentView = 'home'; // home, articleView, login, register, newArticle
+    let selectedArticleId = null;
+
+    function renderApp() {
+        const root = document.getElementById('app-root');
+        if (!root) return;
+
+        // сначала рендерим навигацию
+        renderNav();
+
+        if (currentView === 'home') {
+            renderHomePage(root);
+        } else if (currentView === 'articleView' && selectedArticleId) {
+            renderArticlePage(root, selectedArticleId);
+        } else if (currentView === 'login') {
+            renderLoginForm(root);
+        } else if (currentView === 'register') {
+            renderRegisterForm(root);
+        } else if (currentView === 'newArticle') {
+            if (!currentUser) {
+                currentView = 'login';
+                renderLoginForm(root);
+            } else {
+                renderNewArticleForm(root);
+            }
+        } else {
+            renderHomePage(root);
+        }
+    }
+
+    function renderNav() {
+        const navDiv = document.getElementById('nav-buttons');
+        if (!navDiv) return;
+        navDiv.innerHTML = '';
+        // Кнопка "Главная"
+        const homeBtn = document.createElement('button');
+        homeBtn.textContent = '🏠 Главная';
+        homeBtn.onclick = () => { currentView = 'home'; renderApp(); };
+        navDiv.appendChild(homeBtn);
+
+        if (currentUser) {
+            // пользователь авторизован
+            const newArticleBtn = document.createElement('button');
+            newArticleBtn.textContent = '✏️ Новая статья';
+            newArticleBtn.onclick = () => { currentView = 'newArticle'; renderApp(); };
+            navDiv.appendChild(newArticleBtn);
+
+            const userSpan = document.createElement('span');
+            userSpan.style.fontWeight = '500';
+            userSpan.style.background = '#eef2ff';
+            userSpan.style.padding = '0.5rem 1rem';
+            userSpan.style.borderRadius = '40px';
+            userSpan.style.fontSize = '0.9rem';
+            userSpan.textContent = `👤 ${currentUser.username}`;
+            navDiv.appendChild(userSpan);
+
+            const logoutBtn = document.createElement('button');
+            logoutBtn.textContent = '🚪 Выйти';
+            logoutBtn.onclick = () => logout();
+            navDiv.appendChild(logoutBtn);
+        } else {
+            const loginBtn = document.createElement('button');
+            loginBtn.textContent = '🔐 Войти';
+            loginBtn.onclick = () => { currentView = 'login'; renderApp(); };
+            navDiv.appendChild(loginBtn);
+
+            const registerBtn = document.createElement('button');
+            registerBtn.textContent = '📝 Регистрация';
+            registerBtn.onclick = () => { currentView = 'register'; renderApp(); };
+            navDiv.appendChild(registerBtn);
+        }
+    }
+
+    function renderHomePage(root) {
+        const articles = getArticles();
+        if (articles.length === 0) {
+            root.innerHTML = `<div class="form-card"><p>Пока нет статей. ${currentUser ? 'Напишите первую!' : 'Зарегистрируйтесь и создайте статью.'}</p></div>`;
+            return;
+        }
+        const container = document.createElement('div');
+        container.className = 'articles-grid';
+        articles.forEach(article => {
+            const card = document.createElement('div');
+            card.className = 'article-card';
+            card.onclick = () => {
+                selectedArticleId = article.id;
+                currentView = 'articleView';
+                renderApp();
+            };
+            const date = new Date(article.createdAt).toLocaleDateString('ru-RU');
+            card.innerHTML = `
+                <div class="article-title">${escapeHtml(article.title)}</div>
+                <div class="article-meta">
+                    <span>✍️ ${escapeHtml(article.authorName)}</span>
+                    <span>📅 ${date}</span>
+                </div>
+                <div class="article-excerpt">${escapeHtml(article.content.substring(0, 150))}${article.content.length > 150 ? '...' : ''}</div>
+            `;
+            container.appendChild(card);
+        });
+        root.innerHTML = '';
+        root.appendChild(container);
+    }
+
+    async function renderArticlePage(root, articleId) {
+        const article = getArticleById(articleId);
+        if (!article) {
+            root.innerHTML = '<div class="form-card"><p>Статья не найдена. <span class="back-link" onclick="goHome()">Вернуться на главную</span></p></div>';
+            return;
+        }
+        const comments = getCommentsForArticle(articleId);
+        const datePublished = new Date(article.createdAt).toLocaleDateString('ru-RU', { hour:'2-digit', minute:'2-digit' });
+
+        const articleHTML = `
+            <div>
+                <div class="back-link" onclick="goHome()">← Назад к списку статей</div>
+                <div class="form-card" style="max-width: 800px;">
+                    <h1 style="margin-bottom: 0.5rem;">${escapeHtml(article.title)}</h1>
+                    <div class="article-meta" style="margin-bottom: 1.5rem;">
+                        <span>📝 ${escapeHtml(article.authorName)}</span>
+                        <span>🕒 ${datePublished}</span>
+                    </div>
+                    <div style="white-space: pre-wrap; line-height: 1.6; margin-bottom: 2rem;">${escapeHtml(article.content)}</div>
+                    <hr />
+                    <h3>💬 Комментарии (${comments.length})</h3>
+                    <div id="comments-list"></div>
+                    ${currentUser ? `
+                        <div style="margin-top: 1.5rem;">
+                            <textarea id="new-comment-text" rows="3" placeholder="Написать комментарий..." style="width:100%"></textarea>
+                            <button class="primary" id="submit-comment-btn" style="margin-top: 0.5rem;">Отправить</button>
+                            <div id="comment-message"></div>
+                        </div>
+                    ` : `<p style="margin-top:1rem; background:#f1f5f9; padding:0.75rem; border-radius:1rem;">🔒 <a href="#" id="login-to-comment">Войдите</a>, чтобы оставить комментарий.</p>`}
+                </div>
+            </div>
+        `;
+        root.innerHTML = articleHTML;
+
+        // отрисовать комментарии
+        const commentsContainer = document.getElementById('comments-list');
+        function renderComments() {
+            const freshComments = getCommentsForArticle(articleId);
+            commentsContainer.innerHTML = '';
+            if (freshComments.length === 0) {
+                commentsContainer.innerHTML = '<p style="color:#64748b;">Пока нет комментариев. Будьте первым!</p>';
+                return;
+            }
+            freshComments.forEach(comm => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment';
+                const commDate = new Date(comm.createdAt).toLocaleString('ru-RU');
+                let deleteButton = '';
+                // права: если комментатор = текущий пользователь или автор статьи = текущий пользователь
+                if (currentUser && (comm.userId === currentUser.id || article.authorId === currentUser.id)) {
+                    deleteButton = `<button class="danger" style="padding:0.2rem 0.6rem; font-size:0.7rem;" data-id="${comm.id}">🗑️ Удалить</button>`;
+                }
+                commentDiv.innerHTML = `
+                    <div class="comment-header">
+                        <span class="comment-author">${escapeHtml(comm.userName)}</span>
+                        <div style="display:flex; gap:0.5rem; align-items:center;">
+                            <span class="comment-date">${commDate}</span>
+                            ${deleteButton}
+                        </div>
+                    </div>
+                    <div class="comment-text">${escapeHtml(comm.text)}</div>
+                `;
+                commentsContainer.appendChild(commentDiv);
+            });
+            // навесить обработчики на кнопки удаления
+            document.querySelectorAll('button[data-id]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const commId = parseInt(btn.getAttribute('data-id'));
+                    if (currentUser && confirm('Удалить комментарий?')) {
+                        const success = deleteComment(commId, currentUser.id, article.authorId);
+                        if (success) {
+                            renderComments(); // перерисовка
+                        } else {
+                            alert('Не удалось удалить комментарий');
+                        }
+                    } else {
+                        alert('Недостаточно прав');
+                    }
+                });
+            });
+        }
+        renderComments();
+
+        // обработчик отправки комментария
+        const submitBtn = document.getElementById('submit-comment-btn');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', () => {
+                const textarea = document.getElementById('new-comment-text');
+                const text = textarea.value;
+                if (!text.trim()) {
+                    document.getElementById('comment-message').innerHTML = '<span class="message">Комментарий не может быть пустым</span>';
+                    return;
+                }
+                const result = addComment(articleId, currentUser.id, currentUser.username, text);
+                if (result.success) {
+                    textarea.value = '';
+                    document.getElementById('comment-message').innerHTML = '<span class="success">✓ Комментарий добавлен</span>';
+                    renderComments();
+                    setTimeout(() => {
+                        const msgDiv = document.getElementById('comment-message');
+                        if(msgDiv) msgDiv.innerHTML = '';
+                    }, 2000);
+                } else {
+                    document.getElementById('comment-message').innerHTML = `<span class="message">${result.error}</span>`;
+                }
+            });
+        }
+
+        const loginLink = document.getElementById('login-to-comment');
+        if (loginLink) {
+            loginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentView = 'login';
+                renderApp();
+            });
+        }
+    }
+
+    function renderLoginForm(root) {
+        root.innerHTML = `
+            <div class="form-card">
+                <h2>🔑 Вход в аккаунт</h2>
+                <div class="form-group">
+                    <label>Имя пользователя</label>
+                    <input type="text" id="login-username" placeholder="например: alex_author" />
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="login-password" placeholder="••••••" />
+                </div>
+                <button class="primary" id="do-login">Войти</button>
+                <div id="login-error" class="message"></div>
+                <hr />
+                <p>Нет аккаунта? <span class="back-link" id="goto-register">Зарегистрироваться</span></p>
+            </div>
+        `;
+        document.getElementById('do-login')?.addEventListener('click', () => {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const res = loginUser(username, password);
+            if (res.success) {
+                currentView = 'home';
+                renderApp();
+            } else {
+                document.getElementById('login-error').innerText = res.error || 'Ошибка входа';
+            }
+        });
+        document.getElementById('goto-register')?.addEventListener('click', () => {
+            currentView = 'register';
+            renderApp();
+        });
+    }
+
+    function renderRegisterForm(root) {
+        root.innerHTML = `
+            <div class="form-card">
+                <h2>📝 Регистрация</h2>
+                <div class="form-group">
+                    <label>Имя пользователя</label>
+                    <input type="text" id="reg-username" placeholder="придумайте логин" />
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="reg-password" placeholder="минимум 1 символ" />
+                </div>
+                <button class="primary" id="do-register">Зарегистрироваться</button>
+                <div id="reg-error" class="message"></div>
+                <hr />
+                <p>Уже есть аккаунт? <span class="back-link" id="goto-login">Войти</span></p>
+            </div>
+        `;
+        document.getElementById('do-register')?.addEventListener('click', () => {
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+            const res = registerUser(username, password);
+            if (res.success) {
+                // автоматический вход после регистрации
+                loginUser(username, password);
+                currentView = 'home';
+                renderApp();
+            } else {
+                document.getElementById('reg-error').innerText = res.error;
+            }
+        });
+        document.getElementById('goto-login')?.addEventListener('click', () => {
+            currentView = 'login';
+            renderApp();
+        });
+    }
+
+    function renderNewArticleForm(root) {
+        root.innerHTML = `
+            <div class="form-card">
+                <h2>✍️ Написать новую статью</h2>
+                <div class="form-group">
+                    <label>Заголовок</label>
+                    <input type="text" id="article-title" placeholder="О чем статья?" />
+                </div>
+                <div class="form-group">
+                    <label>Содержание</label>
+                    <textarea id="article-content" placeholder="Текст вашей статьи..."></textarea>
+                </div>
+                <button class="primary" id="publish-article">Опубликовать</button>
+                <div id="article-error" class="message"></div>
+                <button class="outline" id="cancel-article" style="margin-top: 0.5rem;">Отмена</button>
+            </div>
+        `;
+        document.getElementById('publish-article')?.addEventListener('click', () => {
+            const title = document.getElementById('article-title').value;
+            const content = document.getElementById('article-content').value;
+            if (!currentUser) {
+                alert('Вы не авторизованы');
+                currentView = 'login';
+                renderApp();
+                return;
+            }
+            const result = createArticle(title, content, currentUser.id, currentUser.username);
+            if (result.success) {
+                currentView = 'home';
+                renderApp();
+            } else {
+                document.getElementById('article-error').innerText = result.error;
+            }
+        });
+        document.getElementById('cancel-article')?.addEventListener('click', () => {
+            currentView = 'home';
+            renderApp();
+        });
+    }
+
+    // вспомогательные функции
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    window.goHome = function() {
+        currentView = 'home';
+        renderApp();
+    };
+
+    // инициализация и запуск
+    initStorage();
+    loadCurrentUser();
+    renderApp();
+</script>
+</body>
+</html>
